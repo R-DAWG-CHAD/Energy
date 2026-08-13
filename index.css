@@ -1003,3 +1003,53 @@ input[type="range"]::-webkit-slider-thumb:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Interlinked Tools Network Section */
+.tool-network-section {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border-color, #1F2937);
+  background: rgba(15, 23, 42, 0.4);
+}
+.network-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.network-badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #10B981;
+  font-weight: 700;
+}
+.network-header h3 {
+  font-size: 1.25rem;
+  margin: 0.25rem 0;
+  color: #F9FAFB;
+}
+.network-header p {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+}
+.network-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+}
+.network-link {
+  background: rgba(31, 41, 55, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #D1D5DB;
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.825rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.network-link:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10B981;
+  color: #10B981;
+  transform: translateY(-2px);
+}

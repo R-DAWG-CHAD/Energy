@@ -293,6 +293,87 @@ document.addEventListener('DOMContentLoaded', () => {
     elXAxisLabels.innerHTML = labelsHTML;
   }
 
+    // Sync URL Parameters for shareable calculation links
+    syncUrlParams({
+      dailyMiles, gasPrice, gasMPG, evEfficiency, electricRate, offPeakRate, solarCost, solarOffset
+    });
+
+    // Save latest calculated metrics for CSV Export
+    window.lastCalculatedReport = {
+      dailyMiles, annualMiles, gasPrice, gasMPG, evEfficiency, electricRate, offPeakRate,
+      annualGasCost: Math.round(annualGasCost),
+      annualStandardGridCost: Math.round(annualStandardGridCost),
+      annualEffectiveGridCost: Math.round(annualEffectiveGridCost),
+      annualSolarEVCost: Math.round(annualSolarEVCost),
+      annualSavingsVSGas: Math.round(annualSavingsVSGas),
+      netSolarCost: Math.round(netSolarCost),
+      paybackYears: paybackYears > 25 ? '> 25 Years' : paybackYears.toFixed(1) + ' Years'
+    };
+  }
+
+  // Load URL Parameters on initial startup
+  function loadUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('dailyMiles')) elDailyMiles.value = params.get('dailyMiles');
+    if (params.has('gasPrice')) elGasPrice.value = params.get('gasPrice');
+    if (params.has('gasMPG')) elGasMPG.value = params.get('gasMPG');
+    if (params.has('evEfficiency')) elEvEfficiency.value = params.get('evEfficiency');
+    if (params.has('electricRate')) elElectricRate.value = params.get('electricRate');
+    if (params.has('offPeakRate')) elOffPeakRate.value = params.get('offPeakRate');
+    if (params.has('solarCost')) elSolarCost.value = params.get('solarCost');
+    if (params.has('solarOffset')) elSolarOffset.value = params.get('solarOffset');
+  }
+
+  function syncUrlParams(obj) {
+    const params = new URLSearchParams(obj);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  }
+
+  // Global Toast Notification Helper
+  window.showToast = function(message) {
+    let toast = document.getElementById('globalToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'globalToast';
+      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:rgba(16,185,129,0.95);color:#000;padding:12px 20px;border-radius:10px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:9999;transition:all 0.3s ease;transform:translateY(100px);opacity:0;backdrop-filter:blur(10px);';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+    setTimeout(() => {
+      toast.style.transform = 'translateY(100px)';
+      toast.style.opacity = '0';
+    }, 3000);
+  };
+
+  // CSV Export Trigger
+  const btnExportCSV = document.getElementById('btnExportCSV');
+  if (btnExportCSV) {
+    btnExportCSV.addEventListener('click', () => {
+      const r = window.lastCalculatedReport;
+      if (!r) return;
+      const csv = `Metric,Value\nDaily Driving Distance,${r.dailyMiles} miles\nAnnual Mileage,${r.annualMiles} miles\nGas Price,$${r.gasPrice}/gal\nGas MPG,${r.gasMPG}\nEV Efficiency,${r.evEfficiency} mi/kWh\nStandard Electric Rate,$${r.electricRate}/kWh\nOff-Peak Rate,$${r.offPeakRate}/kWh\nAnnual Gas Cost,$${r.annualGasCost}\nAnnual Grid EV Cost,$${r.annualEffectiveGridCost}\nAnnual Solar EV Cost,$${r.annualSolarEVCost}\nAnnual Savings vs Gas,$${r.annualSavingsVSGas}\nNet Solar Cost,$${r.netSolarCost}\nSolar Payback Period,${r.paybackYears}\n`;
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `EV_Solar_Payback_Report.csv`;
+      a.click();
+      showToast('📥 Report Downloaded as CSV!');
+    });
+  }
+
+  // Share URL Trigger
+  const btnShareURL = document.getElementById('btnShareURL');
+  if (btnShareURL) {
+    btnShareURL.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('🔗 Calculation Link Copied to Clipboard!');
+    });
+  }
+
   // Attach Event Listeners to Inputs
   const inputs = [
     elDailyMiles, elGasPrice, elGasMPG, elEvEfficiency,
@@ -309,7 +390,8 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', calculateAll);
   });
 
-  // Initial Calculation Run
+  // Load URL parameters if present, then calculate
+  loadUrlParams();
   calculateAll();
 
 });

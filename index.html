@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Charging & Solar Payback Calculator | Free & Zero Login</title>
+  <meta name="description" content="Calculate your exact EV charging costs (Level 1 vs Level 2 vs Solar), annual gas savings, and home solar payback period with 30% Federal ITC tax credit logic. 100% free and zero login.">
+  <meta name="keywords" content="EV charging calculator, solar payback calculator, electric vehicle gas savings, Level 2 charger ROI, solar battery payback, TOU rate EV charging">
+  <link rel="canonical" href="https://ev-payback-calculator.app/">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:title" content="EV Charging & Solar Payback Calculator">
+  <meta property="og:description" content="Instant real-time calculation of EV charging costs, gas savings, and home solar payback. No email or login required.">
+  <meta property="og:type" content="website">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#bolt-grad)" stroke="#10B981" stroke-width="1.5" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="bolt-grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#10B981"/>
+                <stop offset="1" stop-color="#06B6D4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="brand-title">VoltPayback<span class="brand-badge">PRO</span></span>
+      </div>
+      <div class="nav-links">
+        <a href="#calculator" class="nav-link">Calculator</a>
+        <a href="#visuals" class="nav-link">Visualizer</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+      </div>
+      <div class="privacy-pill">
+        <span class="pulse-dot"></span> 100% Free & Private (Zero Login)
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section with Animated Image Frame -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="tag-pill">⚡ 2026 Updated Efficiency & ITC Formulas</div>
+        <h1 class="hero-title">Discover Your Exact <span class="gradient-text">EV & Solar Savings</span> in Seconds</h1>
+        <p class="hero-subtitle">
+          Calculate Level 1 vs. Level 2 charging efficiency losses, Time-of-Use rate shifts, gas savings, and home solar payback period with zero paywalls or phone calls.
+        </p>
+        <div class="hero-actions">
+          <a href="#calculator" class="btn-primary">Launch Calculator ↓</a>
+          <a href="#visuals" class="btn-secondary">Explore Interactive Graphs</a>
+        </div>
+      </div>
+      
+      <!-- Scroll-Animated Image Frame -->
+      <div class="scroll-frame-wrapper" id="heroFrame">
+        <div class="frame-border-glow"></div>
+        <div class="frame-container">
+          <img src="images/ev_solar_hero.jpg" alt="Electric vehicle charging in solar home garage" class="frame-image">
+          <div class="frame-caption">
+            <div class="caption-icon">💡</div>
+            <div class="caption-text">
+              <strong>Smart Grid + Solar Storage</strong>
+              <span>Save up to 88% on fuel costs by charging with off-peak solar energy.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Presets Bar -->
+  <section class="presets-section">
+    <div class="container">
+      <div class="presets-header">
+        <span class="preset-label">Quick Select Vehicle Preset:</span>
+        <div class="preset-buttons" id="presetContainer">
+          <button class="preset-btn active" data-preset="modelY">Tesla Model Y</button>
+          <button class="preset-btn" data-preset="model3">Tesla Model 3</button>
+          <button class="preset-btn" data-preset="f150">Ford F-150 Lightning</button>
+          <button class="preset-btn" data-preset="bolt">Chevy Bolt EV</button>
+          <button class="preset-btn" data-preset="ioniq5">Hyundai Ioniq 5</button>
+          <button class="preset-btn" data-preset="custom">Custom EV</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Calculator Section -->
+  <main class="calculator-section" id="calculator">
+    <div class="container">
+
+      <!-- Key Output Dashboard Summary (Top Sticky/Fixed Bar) -->
+      <div class="metrics-dashboard">
+        <div class="metric-card primary-card">
+          <div class="metric-label">Annual Net Savings</div>
+          <div class="metric-value gradient-text" id="outAnnualSavings">$2,140</div>
+          <div class="metric-subtext">Compared to driving a gas car</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Grid EV Cost vs. Gas</div>
+          <div class="metric-value" id="outChargingCost">$520 <span class="metric-vs">vs $2,660</span></div>
+          <div class="metric-subtext">Per 12,000 miles driven</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Solar EV Charging Cost</div>
+          <div class="metric-value highlight-cyan" id="outSolarEVCost">$110 / year</div>
+          <div class="metric-subtext" id="outSolarOffsetLabel">With 80% solar offset</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Solar Payback Period</div>
+          <div class="metric-value highlight-emerald" id="outPaybackYears">4.8 Years</div>
+          <div class="metric-subtext" id="outITCCreditLabel">Includes 30% Federal ITC ($5,400)</div>
+        </div>
+      </div>
+
+      <!-- Grid Layout for Inputs and Detailed Charts -->
+      <div class="calc-grid">
+        
+        <!-- Left Column: Interactive Input Controls -->
+        <div class="calc-inputs-card">
+          <div class="card-header">
+            <h2>⚙️ Driving & Energy Parameters</h2>
+            <p>Adjust the sliders to match your location, driving habits, and power rates.</p>
+          </div>
+
+          <!-- Section 1: Driving Habits -->
+          <div class="input-group-title">1. Driving & Gas Vehicle Comparison</div>
+          
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="dailyMiles">Daily Driving Distance</label>
+              <span class="value-badge"><span id="valDailyMiles">35</span> miles/day</span>
+            </div>
+            <input type="range" id="dailyMiles" min="5" max="150" value="35" step="1">
+            <div class="range-sub"><span id="valAnnualMiles">12,775</span> miles per year</div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="gasPrice">Current Gas Price</label>
+              <span class="value-badge">$<span id="valGasPrice">3.65</span> / gal</span>
+            </div>
+            <input type="range" id="gasPrice" min="2.00" max="6.50" value="3.65" step="0.05">
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="gasMPG">Gas Vehicle Fuel Economy</label>
+              <span class="value-badge"><span id="valGasMPG">25</span> MPG</span>
+            </div>
+            <input type="range" id="gasMPG" min="12" max="50" value="25" step="1">
+          </div>
+
+          <!-- Section 2: EV Efficiency & Rates -->
+          <div class="input-group-title">2. Electric Vehicle & Charging Setup</div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="evEfficiency">EV Efficiency</label>
+              <span class="value-badge"><span id="valEvEfficiency">3.6</span> mi / kWh</span>
+            </div>
+            <input type="range" id="evEfficiency" min="1.5" max="5.0" value="3.6" step="0.1">
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label>Charging Equipment & Efficiency Loss</label>
+            </div>
+            <div class="charging-level-toggle">
+              <label class="toggle-option">
+                <input type="radio" name="chargingLevel" value="L1">
+                <div class="toggle-card">
+                  <strong>Level 1 (120V)</strong>
+                  <span>85% Efficient (~15% Loss)</span>
+                </div>
+              </label>
+              <label class="toggle-option">
+                <input type="radio" name="chargingLevel" value="L2" checked>
+                <div class="toggle-card">
+                  <strong>Level 2 (240V)</strong>
+                  <span>90% Efficient (~10% Loss)</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="electricRate">Standard Electric Rate</label>
+              <span class="value-badge">$<span id="valElectricRate">0.16</span> / kWh</span>
+            </div>
+            <input type="range" id="electricRate" min="0.06" max="0.55" value="0.16" step="0.01">
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="offPeakRate">TOU Off-Peak Overnight Rate</label>
+              <span class="value-badge">$<span id="valOffPeakRate">0.09</span> / kWh</span>
+            </div>
+            <input type="range" id="offPeakRate" min="0.03" max="0.35" value="0.09" step="0.01">
+            <div class="checkbox-row">
+              <input type="checkbox" id="useTOU" checked>
+              <label for="useTOU">Apply Overnight Off-Peak Rate Scheduling</label>
+            </div>
+          </div>
+
+          <!-- Section 3: Solar & Battery Systems -->
+          <div class="input-group-title">3. Home Solar & Battery Storage Setup</div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="solarCost">Gross Solar & Battery System Cost</label>
+              <span class="value-badge">$<span id="valSolarCost">18,000</span></span>
+            </div>
+            <input type="range" id="solarCost" min="5000" max="45000" value="18000" step="500">
+          </div>
+
+          <div class="input-row">
+            <div class="input-label-row">
+              <label for="solarOffset">Solar Energy EV Offset</label>
+              <span class="value-badge"><span id="valSolarOffset">80</span>%</span>
+            </div>
+            <input type="range" id="solarOffset" min="0" max="100" value="80" step="5">
+          </div>
+
+          <div class="input-row">
+            <div class="checkbox-row highlight-box">
+              <input type="checkbox" id="applyITC" checked>
+              <label for="applyITC">
+                <strong>Apply 30% Federal ITC Tax Credit</strong>
+                <span>Reduces system cost by <strong id="itcSavingsText">$5,400</strong></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Visual Breakdown & Interactive Charts -->
+        <div class="calc-results-card" id="visuals">
+          
+          <!-- Secondary Scroll-Animated Frame -->
+          <div class="scroll-frame-wrapper inline-frame" id="chargingFrame">
+            <div class="frame-border-glow"></div>
+            <div class="frame-container">
+              <img src="images/smart_charging_app.jpg" alt="Level 2 Smart EV Charger wall mounted" class="frame-image">
+              <div class="frame-caption">
+                <div class="caption-icon">⚡</div>
+                <div class="caption-text">
+                  <strong>Level 2 Smart Charging Optimization</strong>
+                  <span>240V charging reduces thermal energy loss by 5% compared to standard 120V wall outlets.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakdown Tables -->
+          <div class="breakdown-card">
+            <h3>📊 Annual Cost Breakdown Comparison</h3>
+            <table class="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Mode</th>
+                  <th>Annual Fuel / Power</th>
+                  <th>Cost per Mile</th>
+                  <th>Annual Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="dot gas-dot"></span> Gas Vehicle</td>
+                  <td id="tableGasGallons">511 Gal</td>
+                  <td id="tableGasCPM">$0.146</td>
+                  <td class="bold-text" id="tableGasTotal">$1,865</td>
+                </tr>
+                <tr>
+                  <td><span class="dot grid-dot"></span> Grid EV (Standard Rate)</td>
+                  <td id="tableGridKWh">3,871 kWh</td>
+                  <td id="tableGridCPM">$0.048</td>
+                  <td class="bold-text" id="tableGridTotal">$619</td>
+                </tr>
+                <tr class="highlight-row">
+                  <td><span class="dot tou-dot"></span> Grid EV (Off-Peak TOU)</td>
+                  <td id="tableTouKWh">3,871 kWh</td>
+                  <td id="tableTouCPM">$0.027</td>
+                  <td class="bold-text highlight-cyan" id="tableTouTotal">$348</td>
+                </tr>
+                <tr class="super-highlight-row">
+                  <td><span class="dot solar-dot"></span> Solar Powered EV</td>
+                  <td id="tableSolarKWh">3,871 kWh</td>
+                  <td id="tableSolarCPM">$0.005</td>
+                  <td class="bold-text highlight-emerald" id="tableSolarTotal">$70</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Interactive 10-Year Cumulative Cash Flow Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3>📈 10-Year Cumulative Cash Flow & Payback Timeline</h3>
+              <div class="chart-legend">
+                <span class="legend-item"><span class="line-dot gas-line"></span> Gas Car</span>
+                <span class="legend-item"><span class="line-dot grid-line"></span> Grid EV</span>
+                <span class="legend-item"><span class="line-dot solar-line"></span> Solar + EV Payback</span>
+              </div>
+            </div>
+            
+            <div class="svg-chart-container">
+              <svg id="cumulativeChart" viewBox="0 0 600 280" preserveAspectRatio="none">
+                <!-- Grid Lines -->
+                <line x1="50" y1="230" x2="570" y2="230" stroke="#1F2937" stroke-width="1"/>
+                <line x1="50" y1="180" x2="570" y2="180" stroke="#1F2937" stroke-dasharray="4 4"/>
+                <line x1="50" y1="130" x2="570" y2="130" stroke="#1F2937" stroke-dasharray="4 4"/>
+                <line x1="50" y1="80" x2="570" y2="80" stroke="#1F2937" stroke-dasharray="4 4"/>
+                <line x1="50" y1="30" x2="570" y2="30" stroke="#1F2937" stroke-dasharray="4 4"/>
+
+                <!-- Y-Axis Labels -->
+                <text x="40" y="235" font-size="10" fill="#9CA3AF" text-anchor="end">$0</text>
+                <text x="40" y="185" font-size="10" fill="#9CA3AF" text-anchor="end">$10k</text>
+                <text x="40" y="135" font-size="10" fill="#9CA3AF" text-anchor="end">$20k</text>
+                <text x="40" y="85" font-size="10" fill="#9CA3AF" text-anchor="end">$30k</text>
+                <text x="40" y="35" font-size="10" fill="#9CA3AF" text-anchor="end">$40k</text>
+
+                <!-- Paths will be dynamically updated by app.js -->
+                <path id="pathGas" d="" fill="none" stroke="#EF4444" stroke-width="3" stroke-linecap="round"/>
+                <path id="pathGrid" d="" fill="none" stroke="#06B6D4" stroke-width="3" stroke-linecap="round"/>
+                <path id="pathSolar" d="" fill="none" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+
+                <!-- Year Labels on X-Axis -->
+                <g id="xAxisLabels"></g>
+              </svg>
+            </div>
+            
+            <div class="chart-footer-note">
+              * Solar payback timeline reflects net system purchase ($<span id="chartNetSolarCost">12,600</span>) recouped via combined electricity bill offset + EV fuel savings.
+            </div>
+          </div>
+
+          <!-- Third Scroll-Animated Frame -->
+          <div class="scroll-frame-wrapper inline-frame" id="solarBatteryFrame">
+            <div class="frame-border-glow"></div>
+            <div class="frame-container">
+              <img src="images/solar_roof_battery.jpg" alt="Home solar roof panels and battery storage system" class="frame-image">
+              <div class="frame-caption">
+                <div class="caption-icon">☀️</div>
+                <div class="caption-text">
+                  <strong>30% Federal ITC Tax Credit Included</strong>
+                  <span>Under current federal tax rules, qualifying home solar & energy storage systems receive an automatic 30% tax credit.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Recommendation & Trust Section -->
+  <section class="recommendations-section">
+    <div class="container">
+      <div class="section-heading">
+        <h2>🔌 Recommended Upgrades for Maximum ROI</h2>
+        <p>Pair your EV calculation with top-rated Level 2 charging equipment or local solar installer evaluations.</p>
+      </div>
+
+      <div class="rec-grid">
+        <div class="rec-card">
+          <div class="rec-badge">Best Overall L2 Charger</div>
+          <div class="rec-icon">⚡</div>
+          <h3>Emporia Smart Level 2 EV Charger</h3>
+          <p>48 Amp hardwired, energy monitoring, auto-schedules off-peak TOU charging sessions automatically.</p>
+          <ul class="rec-specs">
+            <li>✓ Up to 48A / 11.5kW Fast Charging</li>
+            <li>✓ Built-in Time-Of-Use Automation</li>
+            <li>✓ UL Certified & Energy Star</li>
+          </ul>
+          <a href="https://www.amazon.com/dp/B09ZNN3JB7" target="_blank" rel="noopener noreferrer" class="rec-cta">Check Price on Amazon ↗</a>
+        </div>
+
+        <div class="rec-card featured-rec">
+          <div class="rec-badge highlight">Top Solar Matching</div>
+          <div class="rec-icon">☀️</div>
+          <h3>Free Local Solar Quote Comparison</h3>
+          <p>Compare pre-vetted local solar installers eligible for the 30% Federal Investment Tax Credit.</p>
+          <ul class="rec-specs">
+            <li>✓ 100% Free & No Obligation</li>
+            <li>✓ Calculates Roof Sun Exposure</li>
+            <li>✓ Unlocks Local Utility Rebates</li>
+          </ul>
+          <a href="https://www.energySage.com" target="_blank" rel="noopener noreferrer" class="rec-cta highlight-btn">Compare Solar Quotes ↗</a>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-badge">Portable & Hardwired</div>
+          <div class="rec-icon">🔋</div>
+          <h3>Grizzl-E Level 2 EV Charger</h3>
+          <p>Heavy-duty, weather-proof NEMA 4 aluminum enclosure. Trusted by EV drivers in extreme climates.</p>
+          <ul class="rec-specs">
+            <li>✓ 40 Amp NEMA 14-50 Plug</li>
+            <li>✓ Heavy Duty 24ft Premium Cable</li>
+            <li>✓ 3-Year Full Warranty</li>
+          </ul>
+          <a href="https://grizzl-e.com" target="_blank" rel="noopener noreferrer" class="rec-cta">View Details ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section for SEO -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-heading">
+        <h2>❓ Frequently Asked Questions</h2>
+        <p>Understanding the physics and finances behind electric vehicle charging & solar payback.</p>
+      </div>
+
+      <div class="faq-accordion">
+        <details class="faq-item" open>
+          <summary class="faq-question">What is the efficiency loss difference between Level 1 and Level 2 EV charging?</summary>
+          <div class="faq-answer">
+            Level 1 charging (standard 120V wall outlet) operates at roughly <strong>85% efficiency (~15% energy loss)</strong> because the charging session takes longer, requiring the vehicle's onboard thermal management and battery systems to stay active for extended hours. Level 2 charging (240V dryer-style plug) operates at <strong>90%–94% efficiency (~6-10% energy loss)</strong> because it completes the session faster, wasting less overhead power.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">How does Time-Of-Use (TOU) rate scheduling save money on EV charging?</summary>
+          <div class="faq-answer">
+            Many power companies charge different rates for electricity depending on the time of day. "On-Peak" hours (typically 4 PM to 9 PM) are expensive, while "Off-Peak" or "Super Off-Peak" overnight hours (typically midnight to 6 AM) can be 50% to 70% cheaper. Smart EV chargers or in-car timers automatically start charging at midnight, reducing annual charging costs significantly.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">How does the 30% Federal Solar ITC Tax Credit work?</summary>
+          <div class="faq-answer">
+            The Investment Tax Credit (ITC) allows homeowners who purchase residential solar panels and battery storage systems to claim a tax credit equal to <strong>30% of the total installation cost</strong> on their federal income tax return. For an $18,000 system, this provides a direct $5,400 reduction in federal tax liability, dropping the net system cost to $12,600.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">How long does home solar take to pay for itself when driving an EV?</summary>
+          <div class="faq-answer">
+            When you power an electric vehicle with home solar energy instead of buying gas or expensive grid electricity, your annual utility and fuel savings double. For most U.S. households driving 12,000 miles per year, a solar + EV system pays for itself in <strong>4 to 7 years</strong>, after which all electricity and EV fuel generated by the solar system is essentially 100% free for the remaining 20+ years of the system's lifespan.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="brand-title">VoltPayback PRO</span>
+          <p>Independent, open-access EV & Solar energy financial calculator.</p>
+        </div>
+        <div class="footer-copy">
+          © 2026 VoltPayback • Built for EV Drivers & Home Solar Owners. Zero data collected.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
